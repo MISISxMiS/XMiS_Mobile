@@ -27,6 +27,7 @@ fun EditText (
     modifier: Modifier,
     previousData: String,
     hint: String,
+    trailingIcon: @Composable (() -> Unit)? = null,
     onTextChanged: (String) -> Unit,
 ) {
 
@@ -43,7 +44,7 @@ fun EditText (
         placeholder = {
             Text(
                 text = hint,
-                fontSize = 20.sp,
+                fontSize = 16.sp,
                 fontFamily = FontFamily(Font(R.font.light)),
                 color = Color(0xFF3FE277),
             )
@@ -69,5 +70,6 @@ fun EditText (
             focusedIndicatorColor = Color.Transparent,
 
         ),
+        trailingIcon = trailingIcon
     )
 }
