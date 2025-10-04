@@ -18,11 +18,10 @@ fun WelcomeScreen(onNavigateToChat: () -> Unit) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
             Image(painter = painterResource(id = R.drawable.icon),
                 contentDescription = "Логотип приложения",
-                modifier = Modifier.fillMaxWidth())
+                modifier = Modifier.fillMaxWidth().height(400.dp))
 
             Text(
                 text = "Выбрать места на Китай-городе",
