@@ -1,12 +1,13 @@
 package com.example.xmis_project.ui.theme.ui.screens
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
-import android.util.Log
 import com.example.misis_xmis.network.RetrofitClient
+import com.example.xmis_project.models.Message
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 class DataViewModel : ViewModel() {
     private val _messages = MutableStateFlow(
