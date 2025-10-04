@@ -1,5 +1,6 @@
 package com.example.misis_xmis.network
 
+import com.example.xmis_project.network.ApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
