@@ -81,32 +81,49 @@ fun DataScreen(viewModel: DataViewModel = viewModel()) {
             item {
                 EditText(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp)
-                        .padding(bottom = 12.dp),
-                    previousData = "",
-                    hint = "Куда бы сходить...",
-                    onTextChanged = {
+                        .padding(10.dp)
+                )
+            }
+        }
+    } else {
+        Column(modifier = Modifier
+                .background(color = Color(0x3FE277).copy(alpha = 0.2f))
+                .clip(RoundedCornerShape(24.dp))) {
+            Image(painter = painterResource(R.drawable.fire_example),
+                contentDescription = "",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(vertical=30.dp))
 
-                    },
-                    trailingIcon = {
-                        IconButton(
-                            onClick = {
-                                /* TODO */
-                            },
-                            colors = IconButtonDefaults.iconButtonColors(
-                                contentColor = Color(0xFF3FE277)
-                            )
-                        ) {
-                            Icon(painter = painterResource(R.drawable.ic_send),
-                                contentDescription = "Отправить",
-                                tint = Color.Unspecified,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(shape = RoundedCornerShape(36.dp)),
-                            )
-                        }
-                    }
+            Image(painter = painterResource(R.drawable.image_example_2),
+                contentDescription = "",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(vertical=30.dp))
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Card(
+                shape = RoundedCornerShape(topStart = 20.dp,
+                    topEnd = 20.dp,
+                    bottomStart = 20.dp,
+                    bottomEnd = 0.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.Black
+                ),
+                modifier = Modifier.widthIn(max = 300.dp)
+            ) {
+                Text(
+                    text = message.text,
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(10.dp)
                 )
             }
         }
