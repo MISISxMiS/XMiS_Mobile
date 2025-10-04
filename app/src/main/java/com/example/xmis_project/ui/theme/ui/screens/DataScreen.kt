@@ -108,16 +108,21 @@ fun MessageItem(message: Message) {
         }
     } else {
         Column(modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp)
-                .padding(horizontal = 20.dp)
                 .background(color = Color(0x3FE277).copy(alpha = 0.2f))
                 .clip(RoundedCornerShape(24.dp))) {
             Image(painter = painterResource(R.drawable.fire_example),
                 contentDescription = "",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp))
+                    .height(200.dp)
+                    .padding(vertical=30.dp))
+
+            Image(painter = painterResource(R.drawable.image_example_2),
+                contentDescription = "",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(vertical=30.dp))
         }
         Row(
             modifier = Modifier
