@@ -2,6 +2,8 @@ package com.example.xmis_project.ui.theme.components
 
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -64,7 +67,8 @@ fun MessageItem(message: Message) {
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.7f)
-                .padding(start = 8.dp),
+                .padding(start = 8.dp)
+                .clip(shape = RoundedCornerShape(20.dp)),
         ) {
             Image(
                 painter = painterResource(R.drawable.icon),
@@ -77,7 +81,18 @@ fun MessageItem(message: Message) {
             Column (
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 8.dp)
+                    .background(
+                        brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.4f),
+                                Color.Black.copy(alpha = 0.6f)
+                            ),
+                            startY = 0f,
+                            endY = Float.POSITIVE_INFINITY
+                        ),
+                    )
+                    .padding(start = 8.dp, bottom = 8.dp)
                     .align(Alignment.BottomStart)
             ) {
                 Text(
