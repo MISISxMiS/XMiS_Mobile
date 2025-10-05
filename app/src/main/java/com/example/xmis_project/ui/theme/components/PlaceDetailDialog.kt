@@ -1,5 +1,6 @@
 package com.example.xmis_project.ui.theme.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -24,6 +25,10 @@ import com.example.xmis_project.models.Place
 
 @Composable
 fun PlaceDetailDialog(place: Place, onDismissRequest: () -> Unit, onMapLinkClick: (String) -> Unit) {
+    Log.d("msg", place.photo)
+    Log.d("msg", place.photo)
+    Log.d("msg", place.photo)
+    Log.d("msg", place.photo)
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(shape = RoundedCornerShape(16.dp)) {
             LazyColumn(
@@ -43,7 +48,7 @@ fun PlaceDetailDialog(place: Place, onDismissRequest: () -> Unit, onMapLinkClick
                 // Изображение места
                 item {
                     AsyncImage(
-                        model = place.photo,
+                        model = "http://misis-team.ru:8002/photos/${place.photo}",
                         contentDescription = place.title,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier

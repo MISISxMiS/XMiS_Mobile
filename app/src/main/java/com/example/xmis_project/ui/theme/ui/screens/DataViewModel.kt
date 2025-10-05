@@ -13,10 +13,12 @@ import kotlinx.coroutines.launch
 class DataViewModel : ViewModel() {
     private val _messages = MutableStateFlow(
         listOf(
-            Message("Привет! Это твой собеседник.", false, null),
-            Message("Привет! Как дела?", true, null),
+            Message("Приветствую вас!", false, null),
         ))
     val messages: StateFlow<List<Message>> = _messages
+
+    private val _userLastRequest = MutableStateFlow("Введите запрос")
+    val userLastRequest: StateFlow<String> = _userLastRequest
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -64,4 +66,10 @@ class DataViewModel : ViewModel() {
             }
         }
     }
+
+    fun updateUserLastRequest(request: String) {
+        if (request.length > 20) _userLastRequest.value = request.removeRange(20, request.length) + "..."
+        else _userLastRequest.value = request
+    }
+
 }

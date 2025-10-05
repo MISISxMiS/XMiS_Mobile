@@ -5,15 +5,21 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.xmis_project.ui.theme.ui.screens.AddReviewScreen
 import com.example.xmis_project.ui.theme.ui.screens.DataScreen
 import com.example.xmis_project.ui.theme.ui.screens.WelcomeScreen
+import java.net.URLDecoder
+import java.net.URLEncoder
 
 object Destinations {
     const val WELCOME = "welcome"
-    const val CHAT = "chat"
+    const val CHAT = "chat/{userPrompt}"
+    const val REVIEW = "addReview"
 }
 
 class MainActivity : ComponentActivity() {
@@ -36,14 +42,37 @@ fun AppNavigation() {
     ) {
         composable(Destinations.WELCOME) {
             WelcomeScreen(
-                onNavigateToChat = {
-                    navController.navigate(Destinations.CHAT)
+                onNavigateToChat = { userInput ->
+                    val route = "chat/${URLEncoder.encode(userInput, "UTF-8")}"
+                    navController.navigate(route)
                 }
             )
         }
 
-        composable(Destinations.CHAT) {
-            DataScreen()
+
+        composable(
+            route = Destinations.CHAT,
+            arguments = listOf(
+                navArgument("userPrompt") {
+                    type = NavType.StringType // Define the argument type
+                    defaultValue = "" // Optional: provide a default value
+                    nullable = true // Optional: set to true if the value can be null
+                }
+            )
+        ) { backStackEntry ->
+            val userPrompt = backStackEntry.arguments?.getString("userPrompt") ?: ""
+            val decodedPrompt = URLDecoder.decode(userPrompt, "UTF-8")
+
+            DataScreen(
+                navController = navController,
+                initialUserPrompt = decodedPrompt
+            )
         }
+
+
+        composable(Destinations.REVIEW) {
+            AddReviewScreen(navController = navController)
+        }
+
     }
 }

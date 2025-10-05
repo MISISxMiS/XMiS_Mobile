@@ -2,7 +2,7 @@ package com.example.xmis_project.ui.theme.ui.screens
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.Image
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,8 +22,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -34,39 +32,32 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import coil3.compose.AsyncImage
 import com.example.misis_xmis.R
 import com.example.xmis_project.models.Message
 import com.example.xmis_project.models.Place
-import com.example.xmis_project.ui.theme.components.EditText
 import com.example.xmis_project.ui.theme.components.PlaceDetailDialog
-import kotlinx.coroutines.delay
 
 //
 //@OptIn(ExperimentalMaterial3Api::class)
@@ -197,51 +188,12 @@ fun MessageInput(
         }
     }
 }
-@Composable
-fun MessageItem(message: Message) {
-    if (message.isUser) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Card(
-                shape = RoundedCornerShape(topStart = 20.dp,
-                    topEnd = 20.dp,
-                    bottomStart = 20.dp,
-                    bottomEnd = 0.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xff19AA1E)
-                ),
-                modifier = Modifier.widthIn(max = 300.dp)
-            ) {
-                Text(
-                    text = message.text,
-                    color = Color.White,
-                    modifier = Modifier
-                        .padding(10.dp)
-                )
-            }
-        }
-    } else {
-        Column(modifier = Modifier
-            .padding(20.dp)
-            .background(color = Color(0x3FE277).copy(alpha = 0.2f))
-            .clip(RoundedCornerShape(24.dp))) {
-            Image(painter = painterResource(R.drawable.fire_example),
-                contentDescription = "",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp)
-                    .padding(vertical=30.dp)
-                    .clip(RoundedCornerShape(16.dp)))
-        }
-    }
-}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DataScreen(viewModel: DataViewModel = viewModel()) {
+fun DataScreen(viewModel: DataViewModel = viewModel(),
+               navController: NavController? = null,
+               initialUserPrompt: String? = null) {
     var selectedPlace by remember { mutableStateOf<Place?>(null) }
 
     // Обработчик для открытия ссылки
@@ -253,7 +205,16 @@ fun DataScreen(viewModel: DataViewModel = viewModel()) {
 
     val messages by viewModel.messages.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+
+    val requestUser by viewModel.userLastRequest.collectAsState()
+
     val listState = rememberLazyListState()
+
+    LaunchedEffect(key1 = initialUserPrompt) {
+        initialUserPrompt?.let { prompt ->
+            viewModel.sendUserPrompt(prompt)
+        }
+    }
 
     LaunchedEffect(messages) {
         if (messages.isNotEmpty()) {
@@ -266,7 +227,7 @@ fun DataScreen(viewModel: DataViewModel = viewModel()) {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Вечер в баре",
+                        text = requestUser,
                         fontSize = 24.sp,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
@@ -288,6 +249,7 @@ fun DataScreen(viewModel: DataViewModel = viewModel()) {
                     MessageInput(
                         onSendMessage = { text ->
                             if (text.isNotBlank()) {
+                                viewModel.updateUserLastRequest(text)
                                 viewModel.sendUserPrompt(text)
                             }
                         },
@@ -303,7 +265,8 @@ fun DataScreen(viewModel: DataViewModel = viewModel()) {
                         if (message.places != null && message.places.isNotEmpty()) {
                             RecommendationMessageItem(
                                 message = message,
-                                onPlaceClick = { place -> selectedPlace = place }
+                                onPlaceClick = { place -> selectedPlace = place },
+                                navController = navController
                             )
                         } else {
                             BotMessageItem(message)
@@ -321,12 +284,16 @@ fun DataScreen(viewModel: DataViewModel = viewModel()) {
                 )
             }
 
-            // Диалоговое окно с деталями места
             selectedPlace?.let { place ->
                 PlaceDetailDialog(
                     place = place,
-                    onDismissRequest = { selectedPlace = null },
-                    onMapLinkClick = handleMapLinkClick
+                    onDismissRequest = {
+                        selectedPlace = null
+                    },
+                    onMapLinkClick = { url ->
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        ContextCompat.startActivity(context, intent, null)
+                    },
                 )
             }
         }
@@ -380,7 +347,7 @@ fun BotMessageItem(message: Message) {
 }
 
 @Composable
-fun RecommendationMessageItem(message: Message, onPlaceClick: (Place) -> Unit) {
+fun RecommendationMessageItem(message: Message, onPlaceClick: (Place) -> Unit, navController: NavController? = null) {
     Column(
         modifier = Modifier
             .padding(20.dp)
@@ -401,7 +368,8 @@ fun RecommendationMessageItem(message: Message, onPlaceClick: (Place) -> Unit) {
             PlaceCard(
                 place = place,
                 onItemClick = onPlaceClick,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                navController = navController
             )
         }
     }
@@ -409,7 +377,7 @@ fun RecommendationMessageItem(message: Message, onPlaceClick: (Place) -> Unit) {
 
 
 @Composable
-fun PlaceCard(place: Place, onItemClick: (Place) -> Unit, modifier: Modifier = Modifier) {
+fun PlaceCard(place: Place, onItemClick: (Place) -> Unit, modifier: Modifier = Modifier, navController: NavController?) {
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -418,16 +386,13 @@ fun PlaceCard(place: Place, onItemClick: (Place) -> Unit, modifier: Modifier = M
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
-            // Изображение места
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .background(Color.LightGray)
             ) {
-                // Здесь можно использовать AsyncImage для загрузки реального изображения
-                Image(
-                    painter = painterResource(R.drawable.fire_example), // временное изображение
+                AsyncImage(
+                    model = "http://misis-team.ru:8002/photos/${place.photo}",
                     contentDescription = place.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -435,20 +400,6 @@ fun PlaceCard(place: Place, onItemClick: (Place) -> Unit, modifier: Modifier = M
                         .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                 )
 
-                // Градиент поверх изображения для лучшей читаемости текста
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.3f)),
-                                startY = 0f,
-                                endY = 200f
-                            )
-                        )
-                )
-
-                // Название места поверх изображения
                 Text(
                     text = place.title,
                     color = Color.White,
@@ -460,31 +411,21 @@ fun PlaceCard(place: Place, onItemClick: (Place) -> Unit, modifier: Modifier = M
                 )
             }
 
-            // Описание места
-            Text(
-                text = place.description,
-                modifier = Modifier.padding(16.dp),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            // Кнопка "Написать отзыв"
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
                 Button(
-                    onClick = { onItemClick(place) },
+                    onClick = { navController?.navigate("addReview") },
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xff19AA1E)
+                        containerColor = Color(0xff19AA1E),
                     ),
-                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Написать отзыв",
-                        color = Color.White
+                        text = "Добавить отзыв",
+                        color = Color.White,
                     )
                 }
             }
