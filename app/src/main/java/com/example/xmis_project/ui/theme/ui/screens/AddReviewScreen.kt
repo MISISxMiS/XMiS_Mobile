@@ -56,7 +56,7 @@ fun AddReviewScreen(navController: NavController?) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xff19AA1E)),
                 enabled = placeName.isNotBlank() && description.isNotBlank()
             ) {
-                Text("Продолжить", color = Color.White)
+                Text("Оставить отзыв", color = Color.White)
             }
         }
     ) { paddingValues ->
@@ -77,7 +77,6 @@ fun AddReviewScreen(navController: NavController?) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Поле "Ссылка на 2ГИС"
             OutlinedTextField(
                 value = gisLink,
                 onValueChange = { gisLink = it },
@@ -88,7 +87,6 @@ fun AddReviewScreen(navController: NavController?) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Поле "Описание"
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },

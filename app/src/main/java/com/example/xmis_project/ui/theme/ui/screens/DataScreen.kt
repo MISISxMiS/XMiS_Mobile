@@ -212,7 +212,13 @@ fun DataScreen(viewModel: DataViewModel = viewModel(),
 
     LaunchedEffect(key1 = initialUserPrompt) {
         initialUserPrompt?.let { prompt ->
-            viewModel.sendUserPrompt(prompt)
+            val cleanPrompt = if (prompt.startsWith("chat/")) {
+                prompt.substring(5)
+            } else {
+                prompt
+            }
+            viewModel.updateUserLastRequest(cleanPrompt)
+            viewModel.sendUserPrompt(cleanPrompt)
         }
     }
 

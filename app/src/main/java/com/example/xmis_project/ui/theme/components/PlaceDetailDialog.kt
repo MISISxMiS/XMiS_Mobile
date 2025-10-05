@@ -25,10 +25,6 @@ import com.example.xmis_project.models.Place
 
 @Composable
 fun PlaceDetailDialog(place: Place, onDismissRequest: () -> Unit, onMapLinkClick: (String) -> Unit) {
-    Log.d("msg", place.photo)
-    Log.d("msg", place.photo)
-    Log.d("msg", place.photo)
-    Log.d("msg", place.photo)
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(shape = RoundedCornerShape(16.dp)) {
             LazyColumn(

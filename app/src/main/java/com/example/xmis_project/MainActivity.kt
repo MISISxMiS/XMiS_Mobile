@@ -45,6 +45,9 @@ fun AppNavigation() {
                 onNavigateToChat = { userInput ->
                     val route = "chat/${URLEncoder.encode(userInput, "UTF-8")}"
                     navController.navigate(route)
+                },
+                onNavigateToReview = {
+                    navController.navigate("addReview")
                 }
             )
         }
