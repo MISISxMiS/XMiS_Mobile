@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.misis_xmis.network.RetrofitClient
 import com.example.xmis_project.models.Message
+import com.example.xmis_project.network.dto.RecommendationsRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -12,29 +13,54 @@ import kotlinx.coroutines.launch
 class DataViewModel : ViewModel() {
     private val _messages = MutableStateFlow(
         listOf(
-            Message("Привет! Это твой собеседник.", false),
-            Message("Привет! Как дела?", true),
-            Message("Отлично, спасибо. Я — тестовый бот.", false),
-            Message("Начинаем тестировать функционал чата.", true)
+            Message("Привет! Это твой собеседник.", false, null),
+            Message("Привет! Как дела?", true, null),
         ))
     val messages: StateFlow<List<Message>> = _messages
 
-    fun fetchData() {
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    fun sendUserPrompt(userPrompt: String) {
         viewModelScope.launch {
+            _isLoading.value = true
+
+            val userMessage = Message(userPrompt, true, null)
+            _messages.value = _messages.value + userMessage
+
             try {
-                // --- Запрос 1: Получить список пользователей ---
-                val usersResponse = RetrofitClient.apiService.getUsers()
+                val request = RecommendationsRequest(
+                    user_prompt = userPrompt,
+                    limit = 10
+                )
 
-//                if (usersResponse.isSuccessfu) {
-//                    val users = usersResponse.body()
-//                    Log.d("API_CALL", "Получено пользователей: ${users?.size}")
-                    // Обновление LiveData/StateFlow с данными пользователей
-//                } else {
-//                    Log.e("API_CALL", "Ошибка при получении пользователей: ${usersResponse.code()}")
-//                }
+                val response = RetrofitClient.apiService.getRecommendations(request)
 
+                if (response.success && response.recommendations.isNotEmpty()) {
+                    val botMessage = Message(
+                        text = "Нашел ${response.recommendations.size} подходящих мест:",
+                        isUser = false,
+                        places = response.recommendations
+                    )
+                    _messages.value = _messages.value + botMessage
+                } else {
+                    val errorMessage = Message(
+                        text = "К сожалению, не удалось найти подходящие места. Попробуйте изменить запрос.",
+                        isUser = false,
+                        places = null,
+                    )
+                    _messages.value = _messages.value + errorMessage
+                }
             } catch (e: Exception) {
-                Log.e("API_CALL", "Произошла ошибка сети/парсинга: ${e.message}")
+                Log.e("API_CALL", "Ошибка при запросе рекомендаций: ${e.message}")
+                val errorMessage = Message(
+                    text = "Произошла ошибка при поиске мест. Проверьте подключение к интернету.",
+                    isUser = false,
+                    places = null
+                )
+                _messages.value = _messages.value + errorMessage
+            } finally {
+                _isLoading.value = false
             }
         }
     }
