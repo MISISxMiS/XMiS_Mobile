@@ -32,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -59,81 +60,7 @@ import com.example.xmis_project.models.Message
 import com.example.xmis_project.models.Place
 import com.example.xmis_project.ui.theme.components.PlaceDetailDialog
 
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun DataScreen(viewModel: DataViewModel = viewModel()) {
-//    var selectedPlace by remember { mutableStateOf<Place?>(null) }
-//
-//    // Обработчик для открытия ссылки
-//    val context = LocalContext.current
-//    val handleMapLinkClick = { url: String ->
-//        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-//        ContextCompat.startActivity(context, intent, null)
-//    }
-//
-//    val messages by viewModel.messages.collectAsState()
-//    val isLoading by viewModel.isLoading.collectAsState()
-//    val listState = rememberLazyListState()
-//
-//    LaunchedEffect(messages) {
-//        if (messages.isNotEmpty()) {
-//            listState.animateScrollToItem(0)
-//        }
-//    }
-//
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = {
-//                    Text(
-//                        text = "Вечер в баре",
-//                        fontSize = 24.sp,
-//                        textAlign = TextAlign.Center,
-//                        modifier = Modifier.fillMaxWidth(),
-//                        fontFamily = FontFamily(Font(R.font.ultra_bold))
-//                    )
-//                }
-//            )
-//        }
-//    ) { paddingValues ->
-//        Box(modifier = Modifier.fillMaxSize()) {
-//            LazyColumn(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(paddingValues),
-//                reverseLayout = true,
-//                contentPadding = PaddingValues(vertical = 8.dp)
-//            ) {
-//                item {
-//                    MessageInput(
-//                        onSendMessage = { text ->
-//                            if (text.isNotBlank()) {
-//                                viewModel.sendUserPrompt(text)
-//                            }
-//                        },
-//                        isLoading = isLoading
-//                    )
-//                }
-//
-//                items(messages.reversed()) { message ->
-//                    MessageItem(message)
-//                }
-//            }
-//
-//            // Индикатор загрузки
-//            if (isLoading) {
-//                CircularProgressIndicator(
-//                    modifier = Modifier
-//                        .align(Alignment.Center)
-//                        .padding(16.dp)
-//                )
-//            }
-//        }
-//    }
-//
-//}
-//
+
 @Composable
 fun MessageInput(
     onSendMessage: (String) -> Unit,
@@ -153,7 +80,7 @@ fun MessageInput(
             onValueChange = { text = it },
             label = { Text("Напишите ваш запрос...") },
             modifier = Modifier.weight(1f),
-            enabled = !isLoading
+            enabled = !isLoading,
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -272,7 +199,8 @@ fun DataScreen(viewModel: DataViewModel = viewModel(),
                             RecommendationMessageItem(
                                 message = message,
                                 onPlaceClick = { place -> selectedPlace = place },
-                                navController = navController
+                                navController = navController,
+                                viewModel
                             )
                         } else {
                             BotMessageItem(message)
@@ -353,7 +281,8 @@ fun BotMessageItem(message: Message) {
 }
 
 @Composable
-fun RecommendationMessageItem(message: Message, onPlaceClick: (Place) -> Unit, navController: NavController? = null) {
+fun RecommendationMessageItem(message: Message, onPlaceClick: (Place) -> Unit, navController: NavController? = null,
+                              viewModel: DataViewModel) {
     Column(
         modifier = Modifier
             .padding(20.dp)
@@ -375,7 +304,8 @@ fun RecommendationMessageItem(message: Message, onPlaceClick: (Place) -> Unit, n
                 place = place,
                 onItemClick = onPlaceClick,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                navController = navController
+                navController = navController,
+                viewModel
             )
         }
     }
@@ -383,13 +313,17 @@ fun RecommendationMessageItem(message: Message, onPlaceClick: (Place) -> Unit, n
 
 
 @Composable
-fun PlaceCard(place: Place, onItemClick: (Place) -> Unit, modifier: Modifier = Modifier, navController: NavController?) {
+fun PlaceCard(place: Place, onItemClick: (Place) -> Unit, modifier: Modifier = Modifier, navController: NavController?,
+              viewModel: DataViewModel) {
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent // Фон становится прозрачным
+        ),
+        elevation = CardDefaults.cardElevation(0.dp),
         modifier = modifier
             .fillMaxWidth()
             .clickable { onItemClick(place) },
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
             Box(
@@ -398,7 +332,7 @@ fun PlaceCard(place: Place, onItemClick: (Place) -> Unit, modifier: Modifier = M
                     .height(200.dp)
             ) {
                 AsyncImage(
-                    model = "http://misis-team.ru:8002/photos/${place.photo}",
+                    model = "http://fr.gryaz-vpn.com:8001/photos/${place.photo}",
                     contentDescription = place.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -423,7 +357,9 @@ fun PlaceCard(place: Place, onItemClick: (Place) -> Unit, modifier: Modifier = M
                     .padding(16.dp)
             ) {
                 Button(
-                    onClick = { navController?.navigate("addReview") },
+                    onClick = {
+                        viewModel.clearData()
+                        navController?.navigate("addReview") },
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xff19AA1E),

@@ -50,9 +50,9 @@ fun WelcomeScreen(onNavigateToChat: (String) -> Unit,
 
             Text(
                 text = "Выбрать места на Китай-городе",
-                fontSize = 32.sp,
+                fontSize = 28.sp,
                 modifier = Modifier
-                    .padding(bottom = 12.dp),
+                    .padding(horizontal=12.dp, vertical = 12.dp),
                 fontFamily = FontFamily(Font(R.font.ultra_bold)),
                 textAlign = TextAlign.Center
             )
@@ -61,7 +61,7 @@ fun WelcomeScreen(onNavigateToChat: (String) -> Unit,
                 text = "Какие планы на сегодня?",
                 fontSize = 16.sp,
                 modifier = Modifier
-                    .padding(bottom = 8.dp),
+                    .padding(bottom = 20.dp),
                 fontFamily = FontFamily(Font(R.font.light)),
                 textAlign = TextAlign.Center
             )
@@ -85,8 +85,8 @@ fun WelcomeScreen(onNavigateToChat: (String) -> Unit,
                     .padding(horizontal = 24.dp),
                 content = {
                     Text(
-                        text = "Продолжить?",
-                        fontSize = 32.sp,
+                        text = "Продолжить",
+                        fontSize = 16.sp,
                         modifier = Modifier,
                         fontFamily = FontFamily(Font(R.font.bold)),
                         textAlign = TextAlign.Center,
@@ -109,7 +109,7 @@ fun WelcomeScreen(onNavigateToChat: (String) -> Unit,
             border = BorderStroke(width = 1.dp, color = Color(0xff19AA1E)),
             content = {
                 Text(
-                    text = "Оставить отзыв?",
+                    text = "Оставить отзыв",
                     fontSize = 16.sp,
                     modifier = Modifier,
                     fontFamily = FontFamily(Font(R.font.bold)),

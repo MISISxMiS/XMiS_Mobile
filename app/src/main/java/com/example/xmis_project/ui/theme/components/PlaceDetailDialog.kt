@@ -16,8 +16,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil3.compose.AsyncImage
@@ -44,7 +46,7 @@ fun PlaceDetailDialog(place: Place, onDismissRequest: () -> Unit, onMapLinkClick
                 // Изображение места
                 item {
                     AsyncImage(
-                        model = "http://misis-team.ru:8002/photos/${place.photo}",
+                        model = "http://fr.gryaz-vpn.com:8001/photos/${place.photo}",
                         contentDescription = place.title,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -69,7 +71,7 @@ fun PlaceDetailDialog(place: Place, onDismissRequest: () -> Unit, onMapLinkClick
                 item {
                     if (place.url.isNotBlank()) {
                         TextButton(onClick = { onMapLinkClick(place.url) }) {
-                            Text("На карте 2ГИС")
+                            Text(text="На карте 2ГИС", color = Color(0xff19AA1E))
                         }
                     }
                 }
@@ -84,8 +86,9 @@ fun DetailSection(title: String, items: List<String>) {
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         Text(
             text = title,
+            textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.Normal
         )
         FlowRow(
             modifier = Modifier.padding(top = 4.dp)
@@ -93,11 +96,12 @@ fun DetailSection(title: String, items: List<String>) {
             items.forEach { tag ->
                 Text(
                     text = tag,
+                    color = Color(0xff19AA1E),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier
                         .padding(end = 8.dp, bottom = 4.dp)
                         .background(
-                            color = MaterialTheme.colorScheme.primaryContainer,
+                            color = Color(0xffD9F9E4),
                             shape = RoundedCornerShape(4.dp)
                         )
                         .padding(horizontal = 8.dp, vertical = 4.dp)

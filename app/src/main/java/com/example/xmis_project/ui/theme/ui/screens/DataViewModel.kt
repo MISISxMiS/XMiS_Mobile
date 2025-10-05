@@ -72,4 +72,11 @@ class DataViewModel : ViewModel() {
         else _userLastRequest.value = request
     }
 
+    fun clearData() {
+        _messages.value = listOf(
+            Message("Приветствую вас!", false, null),
+        )
+        _userLastRequest.value = "Введите запрос"
+    }
+
 }
